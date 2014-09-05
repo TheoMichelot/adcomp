@@ -1,4 +1,5 @@
 library(TMB)
+library(numDeriv)
 ##compile("test.cpp","-O0 -g -Woverloaded-virtual")
 compile("test.cpp")
 dyn.load(dynlib("test"))
@@ -28,5 +29,17 @@ obj$gr(x)
 ## 2nd order test
 obj <- MakeADFun(data=list(a=1),parameters=list(x=x),DLL="test",random="x")
 obj$env$spHess(x)
-library(numDeriv)
 diag(hessian(obj$env$f,x))
+
+## =============== Test incomplete gamma
+incpl_gamma <- function(x)pgamma(x[1],x[2])*gamma(x[2])
+obj <- MakeADFun(data=list(a=2),parameters=list(x=x),DLL="test")
+obj$fn(x)
+incpl_gamma(x[1:2]) ## Check
+obj$gr(x)
+grad(incpl_gamma,x[1:2]) ## Check
+
+## 2nd order test
+obj <- MakeADFun(data=list(a=2),parameters=list(x=x),DLL="test",random="x")
+obj$env$spHess(x)
+hessian(incpl_gamma,x[1:2]) ## Check
