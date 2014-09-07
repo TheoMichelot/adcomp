@@ -43,3 +43,17 @@ grad(incpl_gamma,x[1:2]) ## Check
 obj <- MakeADFun(data=list(a=2),parameters=list(x=x),DLL="test",random="x")
 obj$env$spHess(x)
 hessian(incpl_gamma,x[1:2]) ## Check
+
+## =============== Test matrix multiply
+f <- function(x){
+    n <- length(x)/2
+    m1 <- matrix(x[1:n],sqrt(n))
+    m2 <- matrix(x[-(1:n)],sqrt(n))
+    sum(m1%*%m2)
+}
+obj <- MakeADFun(data=list(a=3),parameters=list(x=x),DLL="test")
+obj$fn(x)
+f(x) ## Check
+obj$gr(x)
+grad(f,x) ## Check
+

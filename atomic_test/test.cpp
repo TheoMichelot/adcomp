@@ -17,6 +17,12 @@ Type objective_function<Type>::operator() ()
     arg[1] = x[1];
     arg[2] = Type(0);
     res += D_incpl_gamma_shape(arg)[0];
+  }
+  else if(a==3){
+    CppAD::vector<Type> xx(x.size());
+    for(int i=0;i<x.size();i++)xx[i]=x[i];
+    vector<Type> y=matmul(xx);
+    res = y.sum();
   } else {
     error("Invalid a");
   }

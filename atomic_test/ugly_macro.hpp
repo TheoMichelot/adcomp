@@ -105,13 +105,9 @@ private:								\
 		       )						\
   {									\
     if( vx.size() > 0 ){						\
-      std::cout << vx.size() << " ";					\
-      std::cout << vy.size() << ":";					\
-      std::cout << vx << ":";						\
       bool anyvx = false;						\
       for(int i=0;i<vx.size();i++)anyvx |= vx[i];			\
       for(int i=0;i<vy.size();i++)vy[i] = anyvx;			\
-      std::cout << vy << "\n";						\
     }									\
     ty = ATOMIC_NAME(tx);	       					\
     return true;							\
@@ -165,20 +161,3 @@ CppAD::vector<AD<AD<AD<double> > > > ATOMIC_NAME(CppAD::vector<AD<AD<AD<double> 
 }
 
 
-TMB_ATOMIC_VECTOR_FUNCTION(
-			   // ATOMIC_NAME
-			   D_incpl_gamma_shape
-			   ,
-			   // OUTPUT_DIM
-			   1
-			   ,
-			   // ATOMIC_DOUBLE
-			   vy[0]=Rmath::D_incpl_gamma_shape(vx[0],vx[1],vx[2]);
-			   ,
-			   // ATOMIC_REVERSE
-			   px[0] = exp(-tx[0])*pow(tx[0],tx[1]-Type(1.0))*pow(log(tx[0]),tx[2]) * py[0];
-			   CppAD::vector<Type> tx_(tx);
-			   tx_[2] = tx_[2] + Type(1.0);  // Add one to get partial wrt. tx[1]
-			   px[1] = D_incpl_gamma_shape(tx_)[0] * py[0];
-			   px[2] = Type(0);
-			   )
