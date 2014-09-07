@@ -1,6 +1,5 @@
 #include <TMB.hpp>
 #include "atomic_math.hpp"
-#include "incpl_gamma.hpp"
 
 template<class Type>
 Type objective_function<Type>::operator() ()
