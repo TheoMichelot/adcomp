@@ -83,7 +83,7 @@ AD<AD<AD<double> > > ATOMIC_NAME(AD<AD<AD<double> > > x){		\
 }
 
 
-#define TMB_ATOMIC_VECTOR_FUNCTION(ATOMIC_NAME,OUTPUT_DIM,ATOMIC_DOUBLE,ATOMIC_FORWARD,ATOMIC_REVERSE) \
+#define TMB_ATOMIC_VECTOR_FUNCTION(ATOMIC_NAME,OUTPUT_DIM,ATOMIC_DOUBLE,ATOMIC_REVERSE) \
 CppAD::vector<double> ATOMIC_NAME(CppAD::vector<double> x);		\
 CppAD::vector<AD<double > > ATOMIC_NAME(CppAD::vector<AD<double> > x);	\
 CppAD::vector<AD<AD<double> > > ATOMIC_NAME(CppAD::vector<AD<AD<double> > > x);	\
@@ -113,7 +113,7 @@ private:								\
       for(int i=0;i<vy.size();i++)vy[i] = anyvx;			\
       std::cout << vy << "\n";						\
     }									\
-    ATOMIC_FORWARD;							\
+    ty = ATOMIC_NAME(tx);	       					\
     return true;							\
   }									\
   virtual bool reverse(size_t q,					\
@@ -174,9 +174,6 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   ,
 			   // ATOMIC_DOUBLE
 			   vy[0]=Rmath::D_incpl_gamma_shape(vx[0],vx[1],vx[2]);
-			   ,
-			   // ATOMIC_FORWARD
-			   ty[0] = D_incpl_gamma_shape(tx)[0];
 			   ,
 			   // ATOMIC_REVERSE
 			   px[0] = exp(-tx[0])*pow(tx[0],tx[1]-Type(1.0))*pow(log(tx[0]),tx[2]) * py[0];
