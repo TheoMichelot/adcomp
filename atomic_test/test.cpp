@@ -23,6 +23,12 @@ Type objective_function<Type>::operator() ()
     for(int i=0;i<x.size();i++)xx[i]=x[i];
     vector<Type> y=matmul(xx);
     res = y.sum();
+  }
+  else if(a==4){
+    CppAD::vector<Type> xx(x.size());
+    for(int i=0;i<x.size();i++)xx[i]=x[i];
+    vector<Type> y=matinv(xx);
+    res = y.sum();
   } else {
     error("Invalid a");
   }

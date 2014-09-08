@@ -57,3 +57,15 @@ f(x) ## Check
 obj$gr(x)
 grad(f,x) ## Check
 
+## =============== Test matrix inverse
+f <- function(x){
+    n <- length(x)
+    m <- matrix(x,sqrt(n),sqrt(n))
+    sum(solve(m))
+}
+set.seed(123);x <- rnorm(4e4)
+obj <- MakeADFun(data=list(a=4),parameters=list(x=x),DLL="test")
+obj$fn(x)
+f(x) ## Check
+obj$gr(x)
+grad(f,x) ## Check

@@ -118,3 +118,51 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   CppAD::vector<Type> res2=matmul(arg2);
 			   for(int i=0;i<n*n;i++){px[i]=res1[i];px[i+n*n]=res2[i];}
 			   )
+
+
+/* Utilities for easier use of matmul symbol */
+template<class Type>
+matrix<Type> vec2mat(CppAD::vector<Type> x){
+  int n=sqrt(x.size());
+  matrix<Type> res(n,n);
+  for(int i=0;i<n*n;i++)res(i)=x[i];
+  return res;
+}
+template<class Type>
+CppAD::vector<Type> mat2vec(matrix<Type> x){
+  int n=x.size();
+  CppAD::vector<Type> res(n);
+  for(int i=0;i<n;i++)res[i]=x(i);
+  return res;
+}
+template<class Type>
+matrix<Type> matmul(matrix<Type> x, matrix<Type> y){
+  CppAD::vector<Type> arg(x.size()+y.size());
+  for(int i=0;i<x.size();i++){arg[i]=x(i);}
+  for(int i=0;i<y.size();i++){arg[i+x.size()]=y(i);}
+  return vec2mat(matmul(arg));
+}
+
+TMB_ATOMIC_VECTOR_FUNCTION(
+			   // ATOMIC_NAME
+			   matinv
+			   ,
+			   // OUTPUT_DIM
+			   vx.size()
+			   ,
+			   // ATOMIC_DOUBLE
+			   int n=sqrt(vx.size());
+			   matrix<double> X(n,n);
+			   for(int i=0;i<n*n;i++){X(i)=vx[i];}
+			   matrix<double> res=X.inverse();   // Use Eigen matrix inverse (LU)
+			   for(int i=0;i<n*n;i++)vy[i]=res(i);
+			   ,
+			   // ATOMIC_REVERSE  (-f(X)^T*W*f(X)^T)
+			   int n=sqrt(ty.size());
+			   matrix<Type> W=vec2mat(py);       // Range direction
+			   matrix<Type> Y=vec2mat(ty);       // f(X)
+			   matrix<Type> Yt=Y.transpose();    // f(X)^T
+			   matrix<Type> tmp=matmul(W,Yt);    // W*f(X)^T
+			   matrix<Type> res=-matmul(Yt,tmp); // -f(X)^T*W*f(X)^T
+			   px=mat2vec(res);
+			   )
