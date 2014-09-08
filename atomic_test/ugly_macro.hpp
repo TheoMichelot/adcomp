@@ -126,7 +126,9 @@ private:								\
 			      const CppAD::vector<bool>& rt,		\
 			      CppAD::vector<bool>& st)			\
   {									\
-    for(size_t i=0;i<st.size();i++)st[i]=true;				\
+    bool anyrt = false;							\
+    for(int i=0;i<rt.size();i++)anyrt |= rt[i];				\
+    for(size_t i=0;i<st.size();i++)st[i]=anyrt;				\
     return true;							\
   }									\
   virtual bool rev_sparse_jac(size_t q,					\

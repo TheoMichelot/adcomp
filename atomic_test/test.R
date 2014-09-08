@@ -57,15 +57,25 @@ f(x) ## Check
 obj$gr(x)
 grad(f,x) ## Check
 
+## 2nd order test
+obj <- MakeADFun(data=list(a=3),parameters=list(x=x),DLL="test",random="x")
+obj$env$spHess(x)
+round(hessian(f,x),8) ## Check
+
 ## =============== Test matrix inverse
 f <- function(x){
     n <- length(x)
     m <- matrix(x,sqrt(n),sqrt(n))
     sum(solve(m))
 }
-set.seed(123);x <- rnorm(4e4)
+set.seed(123);x <- rnorm(9)
 obj <- MakeADFun(data=list(a=4),parameters=list(x=x),DLL="test")
 obj$fn(x)
 f(x) ## Check
 obj$gr(x)
 grad(f,x) ## Check
+
+## 2nd order test
+obj <- MakeADFun(data=list(a=4),parameters=list(x=x),DLL="test",random="x")
+obj$env$spHess(x)
+hessian(f,x) ## Check
