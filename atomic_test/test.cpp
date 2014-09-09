@@ -40,6 +40,12 @@ Type objective_function<Type>::operator() ()
     arg[0] = x[0];
     arg[1] = x[1];
     res += inv_incpl_gamma(arg)[0];
+  }
+  else if(a==7){
+    CppAD::vector<Type> arg(2);
+    arg[0] = x[0];
+    arg[1] = Type(0);
+    res += D_lgamma(arg)[0];
   } else {
     error("Invalid a");
   }

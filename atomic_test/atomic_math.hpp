@@ -46,6 +46,12 @@ namespace Rmath {
     return qgamma(p, shape, scale, 1, 0);
   }
 
+  /* n'th order derivative of log gamma function */
+  double D_lgamma(double x, double n){
+    if(n<.5)return lgammafn(x);
+    else return psigamma(x,n-1.0);
+  }
+
 }
 
 #include "ugly_macro.hpp"
@@ -110,6 +116,24 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   arg[1] = shape;
 			   arg[2] = Type(1); // 1st order partial
 			   px[1] = -D_incpl_gamma_shape(arg)[0] / tmp * py[0];
+			   )
+
+TMB_ATOMIC_VECTOR_FUNCTION(
+			   // ATOMIC_NAME
+			   D_lgamma
+			   ,
+			   // OUTPUT_DIM
+			   1
+			   ,
+			   // ATOMIC_DOUBLE
+			   vy[0]=Rmath::D_lgamma(vx[0],vx[1]);
+			   ,
+			   // ATOMIC_REVERSE
+			   CppAD::vector<Type> tx_(2);
+			   tx_[0]=tx[0];
+			   tx_[1]=tx[1]+Type(1.0);
+			   px[0] = D_lgamma(tx_)[0] * py[0];
+			   px[1] = Type(0);
 			   )
 
 TMB_ATOMIC_VECTOR_FUNCTION(
