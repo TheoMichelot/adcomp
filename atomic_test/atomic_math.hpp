@@ -185,3 +185,15 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   CppAD::vector<Type> invX=matinv(tx);
 			   for(int i=0;i<tx.size();i++)px[i]=invX[i]*py[0];
 			   )
+
+
+/* Temporary test of dmvnorm implementation based on atomic symbols.
+   Should reduce tape size from O(n^3) to O(n^2).
+*/
+template<class Type>
+Type nldmvnorm(vector<Type> x, matrix<Type> Sigma){
+  matrix<Type> Q=vec2mat(matinv(mat2vec(Sigma)));
+  Type logdetQ = -logdet(mat2vec(Sigma))[0];
+  Type quadform = (x*(Q*x)).sum();
+  return -Type(.5)*logdetQ + Type(.5)*quadform + x.size()*Type(log(sqrt(2.0*M_PI)));
+}
