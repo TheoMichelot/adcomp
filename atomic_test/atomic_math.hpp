@@ -166,3 +166,22 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   matrix<Type> res=-matmul(Yt,tmp); // -f(X)^T*W*f(X)^T
 			   px=mat2vec(res);
 			   )
+
+TMB_ATOMIC_VECTOR_FUNCTION(
+			   // ATOMIC_NAME
+			   logdet
+			   ,
+			   // OUTPUT_DIM
+			   1
+			   ,
+			   // ATOMIC_DOUBLE
+			   matrix<double> X=vec2mat(vx);
+			   matrix<double> LU=X.lu().matrixLU();    // Use Eigen LU decomposition
+			   vector<double> LUdiag = LU.diagonal();
+			   double res=LUdiag.abs().log().sum();    // TODO: currently PD only - take care of sign.
+			   vy[0] = res;
+			   ,
+			   // ATOMIC_REVERSE  (X^-1*W[0])
+			   CppAD::vector<Type> invX=matinv(tx);
+			   for(int i=0;i<tx.size();i++)px[i]=invX[i]*py[0];
+			   )

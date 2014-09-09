@@ -79,3 +79,16 @@ grad(f,x) ## Check
 obj <- MakeADFun(data=list(a=4),parameters=list(x=x),DLL="test",random="x")
 obj$env$spHess(x)
 hessian(f,x) ## Check
+
+## =============== Test matrix log-determinant
+f <- function(x){
+    n <- length(x)
+    m <- matrix(x,sqrt(n),sqrt(n))
+    determinant(m)$mod
+}
+set.seed(123);x <- matrix(rnorm(9),3);x <- x%*%t(x);x <- as.vector(x) ## PD only !
+obj <- MakeADFun(data=list(a=5),parameters=list(x=x),DLL="test")
+obj$fn(x)
+f(x) ## Check
+obj$gr(x)
+grad(f,x) ## Check
