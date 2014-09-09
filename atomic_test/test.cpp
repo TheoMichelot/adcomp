@@ -34,6 +34,12 @@ Type objective_function<Type>::operator() ()
     CppAD::vector<Type> xx(x.size());
     for(int i=0;i<x.size();i++)xx[i]=x[i];
     res = logdet(xx)[0];
+  }
+  else if(a==6){
+    CppAD::vector<Type> arg(2);
+    arg[0] = x[0];
+    arg[1] = x[1];
+    res += inv_incpl_gamma(arg)[0];
   } else {
     error("Invalid a");
   }

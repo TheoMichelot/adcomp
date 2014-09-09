@@ -92,3 +92,11 @@ obj$fn(x)
 f(x) ## Check
 obj$gr(x)
 grad(f,x) ## Check
+
+## =============== Test inv incomplete gamma
+inv_incpl_gamma <- function(x)qgamma(x[1]/gamma(x[2]),x[2])
+obj <- MakeADFun(data=list(a=6),parameters=list(x=x),DLL="test")
+obj$fn(x)
+inv_incpl_gamma(x[1:2]) ## Check
+obj$gr(x)
+grad(inv_incpl_gamma,x[1:2]) ## Check

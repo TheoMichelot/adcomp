@@ -40,6 +40,11 @@ namespace Rmath {
     return result;
   }
 
+  double inv_incpl_gamma(double y, double shape){
+    double p=y/gammafn(shape);
+    double scale=1.0;
+    return qgamma(p, shape, scale, 1, 0);
+  }
 
 }
 
@@ -83,6 +88,28 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   tx_[2] = tx_[2] + Type(1.0);  // Add one to get partial wrt. tx[1]
 			   px[1] = D_incpl_gamma_shape(tx_)[0] * py[0];
 			   px[2] = Type(0);
+			   )
+
+TMB_ATOMIC_VECTOR_FUNCTION(
+			   // ATOMIC_NAME
+			   inv_incpl_gamma
+			   ,
+			   // OUTPUT_DIM
+			   1
+			   ,
+			   // ATOMIC_DOUBLE
+			   vy[0]=Rmath::inv_incpl_gamma(vx[0],vx[1]);
+			   ,
+			   // ATOMIC_REVERSE
+			   Type value = ty[0];
+			   Type shape = tx[1];
+			   Type tmp = exp(-value)*pow(value,shape-Type(1));
+			   px[0] = 1.0 / tmp * py[0];
+			   CppAD::vector<Type> arg(3);
+			   arg[0] = value;
+			   arg[1] = shape;
+			   arg[2] = Type(1); // 1st order partial
+			   px[1] = -D_incpl_gamma_shape(arg)[0] / tmp * py[0];
 			   )
 
 TMB_ATOMIC_VECTOR_FUNCTION(
