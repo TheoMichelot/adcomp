@@ -56,27 +56,38 @@ namespace Rmath {
 
 #include "ugly_macro.hpp"
 
-TMB_ATOMIC_UNARY_FUNCTION(
-			  // ATOMIC_NAME
-			  pnorm,
-			  // ATOMIC_DOUBLE
-			  Rmath::pnorm5(x,0,1,1,0);,
-			  // ATOMIC_FORWARD
-			  ty[0] = pnorm(tx[0]);,
-			  // ATOMIC_REVERSE
-			  px[0] = dnorm(tx[0],Type(0),Type(1),false) * py[0];
-			  )
+/* Derivative of pnorm1 (based on functions with known derivatives) */
+template<class Type>
+Type dnorm1(Type x){
+  return Type(1.0/sqrt(2.0*M_PI)) * exp(-Type(.5)*x*x);
+}
 
-TMB_ATOMIC_UNARY_FUNCTION(
-			  // ATOMIC_NAME
-			  qnorm,
-			  // ATOMIC_DOUBLE
-			  Rmath::qnorm5(x,0,1,1,0);,
-			  // ATOMIC_FORWARD
-			  ty[0] = qnorm(tx[0]);,
-			  // ATOMIC_REVERSE
-			  px[0] = Type(1) / dnorm(ty[0],Type(0),Type(1),false) * py[0];
-			  )
+TMB_ATOMIC_VECTOR_FUNCTION(
+			   // ATOMIC_NAME
+			   pnorm1
+			   ,
+			   // OUTPUT_DIM
+			   1
+			   ,
+			   // ATOMIC_DOUBLE
+			   ty[0] = Rmath::pnorm5(tx[0],0,1,1,0);
+			   ,
+			   // ATOMIC_REVERSE
+			   px[0] = dnorm1(tx[0]) * py[0];
+			   )
+
+TMB_ATOMIC_VECTOR_FUNCTION(
+			   // ATOMIC_NAME
+			   qnorm1
+			   ,
+			   // OUTPUT_DIM
+			   1,
+			   // ATOMIC_DOUBLE
+			   ty[0] = Rmath::qnorm5(tx[0],0,1,1,0);
+			   ,
+			   // ATOMIC_REVERSE
+			   px[0] = Type(1) / dnorm1(ty[0]) * py[0];
+			   )
 
 TMB_ATOMIC_VECTOR_FUNCTION(
 			   // ATOMIC_NAME
@@ -237,6 +248,23 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   for(int i=0;i<tx.size();i++)px[i]=invX[i]*py[0];
 			   )
 
+
+/* ================================== INTERFACES
+*/
+
+template<class Type>
+Type pnorm(Type q, Type mean = 0, Type sd = 1){
+  CppAD::vector<Type> px(1);
+  px[0] = (q - mean) / sd;
+  return pnorm1(px)[0];
+}
+
+template<class Type>
+Type qnorm(Type p, Type mean = 0, Type sd = 1){
+  CppAD::vector<Type> px(1);
+  px[0] = p;
+  return sd*qnorm1(px)[0] + mean;
+}
 
 /* Temporary test of dmvnorm implementation based on atomic symbols.
    Should reduce tape size from O(n^3) to O(n^2).
