@@ -163,7 +163,6 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   px[1] = Type(0);
 			   )
 
-
 template<class Type> /* Header of matmul interface */
 matrix<Type> matmul(matrix<Type> x, matrix<Type> y);
 TMB_ATOMIC_VECTOR_FUNCTION(
@@ -192,14 +191,6 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			     px[i+n*n] = res2(i);
 			   }
 			   )
-/* matmul interface */
-template<class Type>
-matrix<Type> matmul(matrix<Type> x, matrix<Type> y){
-  CppAD::vector<Type> arg(x.size()+y.size());
-  for(int i=0;i<x.size();i++){arg[i]=x(i);}
-  for(int i=0;i<y.size();i++){arg[i+x.size()]=y(i);}
-  return vec2mat(matmul(arg),x.rows(),y.cols());
-}
 
 TMB_ATOMIC_VECTOR_FUNCTION(
 			   // ATOMIC_NAME
@@ -245,9 +236,27 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   for(int i=0;i<tx.size();i++)px[i]=invX[i]*py[0];
 			   )
 
-
 /* ================================== INTERFACES
 */
+
+template<class Type>
+matrix<Type> matmul(matrix<Type> x, matrix<Type> y){
+  CppAD::vector<Type> arg(x.size()+y.size());
+  for(int i=0;i<x.size();i++){arg[i]=x(i);}
+  for(int i=0;i<y.size();i++){arg[i+x.size()]=y(i);}
+  return vec2mat(matmul(arg),x.rows(),y.cols());
+}
+
+template<class Type>
+matrix<Type> matinv(matrix<Type> x){
+  int n=x.rows();
+  return vec2mat(matinv(mat2vec(x)),n,n);
+}
+
+template<class Type>
+Type logdet(matrix<Type> x){
+  return logdet(mat2vec(x))[0];
+}
 
 template<class Type>
 Type pnorm(Type q, Type mean = 0, Type sd = 1, int give_log=0){
@@ -297,8 +306,8 @@ Type qgamma(Type q, Type shape, Type scale = 1, int give_log=0){
 */
 template<class Type>
 Type nldmvnorm(vector<Type> x, matrix<Type> Sigma){
-  matrix<Type> Q=vec2mat(matinv(mat2vec(Sigma)));
-  Type logdetQ = -logdet(mat2vec(Sigma))[0];
+  matrix<Type> Q=matinv(Sigma);
+  Type logdetQ = -logdet(Sigma);
   Type quadform = (x*(Q*x)).sum();
   return -Type(.5)*logdetQ + Type(.5)*quadform + x.size()*Type(log(sqrt(2.0*M_PI)));
 }
