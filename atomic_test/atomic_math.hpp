@@ -284,6 +284,13 @@ Type pgamma(Type q, Type shape, Type scale = 1){
   return D_incpl_gamma_shape(tx)[0] / exp(lgamma(shape));
 }
 
+template<class Type>
+Type qgamma(Type q, Type shape, Type scale = 1){
+  CppAD::vector<Type> tx(2);
+  tx[0] = q * exp(lgamma(shape));
+  tx[1] = shape;
+  return inv_incpl_gamma(tx)[0] * scale;
+}
 
 /* Temporary test of dmvnorm implementation based on atomic symbols.
    Should reduce tape size from O(n^3) to O(n^2).

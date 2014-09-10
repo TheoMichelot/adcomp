@@ -53,6 +53,9 @@ Type objective_function<Type>::operator() ()
   else if(a==8){
     res += pgamma(x[0],x[1],x[2]);
   }
+  else if(a==9){
+    res += qgamma(x[0],x[1],x[2]);
+  }
   else {
     error("Invalid a");
   }
