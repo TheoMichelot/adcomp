@@ -1,3 +1,4 @@
+namespace atomic {
 /* Namespace with double versions of R special math library */
 namespace Rmath {
   #include <Rmath.h>
@@ -254,17 +255,35 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 
 template<class Type>
 Type pnorm(Type q, Type mean = 0, Type sd = 1){
-  CppAD::vector<Type> px(1);
-  px[0] = (q - mean) / sd;
-  return pnorm1(px)[0];
+  CppAD::vector<Type> tx(1);
+  tx[0] = (q - mean) / sd;
+  return pnorm1(tx)[0];
 }
 
 template<class Type>
 Type qnorm(Type p, Type mean = 0, Type sd = 1){
-  CppAD::vector<Type> px(1);
-  px[0] = p;
-  return sd*qnorm1(px)[0] + mean;
+  CppAD::vector<Type> tx(1);
+  tx[0] = p;
+  return sd*qnorm1(tx)[0] + mean;
 }
+
+template<class Type>
+Type lgamma(Type x){
+  CppAD::vector<Type> tx(2);
+  tx[0] = x;
+  tx[1] = Type(0);
+  return D_lgamma(tx)[0];
+}
+
+template<class Type>
+Type pgamma(Type q, Type shape, Type scale = 1){
+  CppAD::vector<Type> tx(3);
+  tx[0] = q/scale;
+  tx[1] = shape;
+  tx[2] = Type(0); // 0'order deriv
+  return D_incpl_gamma_shape(tx)[0] / exp(lgamma(shape));
+}
+
 
 /* Temporary test of dmvnorm implementation based on atomic symbols.
    Should reduce tape size from O(n^3) to O(n^2).
@@ -276,3 +295,5 @@ Type nldmvnorm(vector<Type> x, matrix<Type> Sigma){
   Type quadform = (x*(Q*x)).sum();
   return -Type(.5)*logdetQ + Type(.5)*quadform + x.size()*Type(log(sqrt(2.0*M_PI)));
 }
+
+} /* End namespace atomic */

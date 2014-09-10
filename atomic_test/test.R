@@ -108,3 +108,12 @@ obj$fn(x)
 lgamma(x[1]) ## Check
 obj$gr(x)
 grad(lgamma,x[1]) ## Check
+
+## =============== Test pgamma
+x[1:3] <- 1:3
+f <- function(x)pgamma(x[1],x[2],scale=x[3])
+obj <- MakeADFun(data=list(a=8),parameters=list(x=x),DLL="test")
+obj$fn(x)
+f(x[1:3]) ## Check
+obj$gr(x)
+grad(f,x[1:3]) ## Check

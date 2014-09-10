@@ -6,6 +6,9 @@ Type objective_function<Type>::operator() ()
 {
   DATA_INTEGER(a);
   PARAMETER_VECTOR(x);
+
+  using namespace atomic;
+
   Type res=0;
   if(a==0){
     for(int i=0;i<x.size();i++)res+=pnorm(x[i]);
@@ -46,7 +49,11 @@ Type objective_function<Type>::operator() ()
     arg[0] = x[0];
     arg[1] = Type(0);
     res += D_lgamma(arg)[0];
-  } else {
+  }
+  else if(a==8){
+    res += pgamma(x[0],x[1],x[2]);
+  }
+  else {
     error("Invalid a");
   }
   return res;
