@@ -55,7 +55,7 @@ namespace Rmath {
 
 }
 
-#include "ugly_macro.hpp"
+#include "atomic_macro.hpp"
 
 /* Utilities for conversion between CppAD::vector and Eigen::Matrix */
 template<class Type>

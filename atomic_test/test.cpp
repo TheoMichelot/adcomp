@@ -1,5 +1,4 @@
 #include <TMB.hpp>
-#include "atomic_math.hpp"
 
 template<class Type>
 Type objective_function<Type>::operator() ()
