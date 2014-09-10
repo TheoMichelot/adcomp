@@ -59,27 +59,27 @@ double ATOMIC_NAME(double x){						\
 }									\
 atomic_##ATOMIC_NAME<double> afun1##ATOMIC_NAME("atomic_" #ATOMIC_NAME); \
 AD<double> ATOMIC_NAME(AD<double> x){					\
-  CppAD::vector<AD<double> > vx(1);					\
-  CppAD::vector<AD<double> > vy(1);					\
-  vx[0]=x;								\
-  afun1##ATOMIC_NAME(vx,vy);						\
-  return vy[0];								\
+  CppAD::vector<AD<double> > tx(1);					\
+  CppAD::vector<AD<double> > ty(1);					\
+  tx[0]=x;								\
+  afun1##ATOMIC_NAME(tx,ty);						\
+  return ty[0];								\
 }									\
 atomic_##ATOMIC_NAME<AD<double> > afun2##ATOMIC_NAME("atomic_" #ATOMIC_NAME); \
 AD<AD<double> > ATOMIC_NAME(AD<AD<double> > x){				\
-  CppAD::vector<AD<AD<double> > > vx(1);				\
-  CppAD::vector<AD<AD<double> > > vy(1);				\
-  vx[0]=x;								\
-  afun2##ATOMIC_NAME(vx,vy);						\
-  return vy[0];								\
+  CppAD::vector<AD<AD<double> > > tx(1);				\
+  CppAD::vector<AD<AD<double> > > ty(1);				\
+  tx[0]=x;								\
+  afun2##ATOMIC_NAME(tx,ty);						\
+  return ty[0];								\
 }									\
 atomic_##ATOMIC_NAME<AD<AD<double> > > afun3##ATOMIC_NAME("atomic_" #ATOMIC_NAME); \
 AD<AD<AD<double> > > ATOMIC_NAME(AD<AD<AD<double> > > x){		\
-  CppAD::vector<AD<AD<AD<double> > > > vx(1);				\
-  CppAD::vector<AD<AD<AD<double> > > > vy(1);				\
-  vx[0]=x;								\
-  afun3##ATOMIC_NAME(vx,vy);						\
-  return vy[0];								\
+  CppAD::vector<AD<AD<AD<double> > > > tx(1);				\
+  CppAD::vector<AD<AD<AD<double> > > > ty(1);				\
+  tx[0]=x;								\
+  afun3##ATOMIC_NAME(tx,ty);						\
+  return ty[0];								\
 }
 
 
@@ -138,28 +138,28 @@ private:								\
     error("Should not be called");					\
   }									\
 };									\
-CppAD::vector<double> ATOMIC_NAME(CppAD::vector<double> vx){		\
-  CppAD::vector<double> vy(OUTPUT_DIM);					\
+CppAD::vector<double> ATOMIC_NAME(CppAD::vector<double> tx){		\
+  CppAD::vector<double> ty(OUTPUT_DIM);					\
   ATOMIC_DOUBLE;							\
-  return vy;								\
+  return ty;								\
 }									\
 atomic##ATOMIC_NAME<double> afun1##ATOMIC_NAME("atomic_" #ATOMIC_NAME); \
-CppAD::vector<AD<double > > ATOMIC_NAME(CppAD::vector<AD<double> > vx){	\
-  CppAD::vector<AD<double> > vy(OUTPUT_DIM);				\
-  afun1##ATOMIC_NAME(vx,vy);						\
-  return vy;								\
+CppAD::vector<AD<double > > ATOMIC_NAME(CppAD::vector<AD<double> > tx){	\
+  CppAD::vector<AD<double> > ty(OUTPUT_DIM);				\
+  afun1##ATOMIC_NAME(tx,ty);						\
+  return ty;								\
 }									\
 atomic##ATOMIC_NAME<AD<double> > afun2##ATOMIC_NAME("atomic_" #ATOMIC_NAME); \
-CppAD::vector<AD<AD<double> > > ATOMIC_NAME(CppAD::vector<AD<AD<double> > > vx){ \
-  CppAD::vector<AD<AD<double> > > vy(OUTPUT_DIM);			\
-  afun2##ATOMIC_NAME(vx,vy);						\
-  return vy;								\
+CppAD::vector<AD<AD<double> > > ATOMIC_NAME(CppAD::vector<AD<AD<double> > > tx){ \
+  CppAD::vector<AD<AD<double> > > ty(OUTPUT_DIM);			\
+  afun2##ATOMIC_NAME(tx,ty);						\
+  return ty;								\
 }									\
 atomic##ATOMIC_NAME<AD<AD<double> > > afun3##ATOMIC_NAME("atomic_" #ATOMIC_NAME); \
-CppAD::vector<AD<AD<AD<double> > > > ATOMIC_NAME(CppAD::vector<AD<AD<AD<double> > > > vx){ \
-  CppAD::vector<AD<AD<AD<double> > > > vy(OUTPUT_DIM);			\
-  afun3##ATOMIC_NAME(vx,vy);						\
-  return vy;								\
+CppAD::vector<AD<AD<AD<double> > > > ATOMIC_NAME(CppAD::vector<AD<AD<AD<double> > > > tx){ \
+  CppAD::vector<AD<AD<AD<double> > > > ty(OUTPUT_DIM);			\
+  afun3##ATOMIC_NAME(tx,ty);						\
+  return ty;								\
 }
 
 

@@ -86,7 +86,7 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   1
 			   ,
 			   // ATOMIC_DOUBLE
-			   vy[0]=Rmath::D_incpl_gamma_shape(vx[0],vx[1],vx[2]);
+			   ty[0]=Rmath::D_incpl_gamma_shape(tx[0],tx[1],tx[2]);
 			   ,
 			   // ATOMIC_REVERSE
 			   px[0] = exp(-tx[0])*pow(tx[0],tx[1]-Type(1.0))*pow(log(tx[0]),tx[2]) * py[0];
@@ -104,7 +104,7 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   1
 			   ,
 			   // ATOMIC_DOUBLE
-			   vy[0]=Rmath::inv_incpl_gamma(vx[0],vx[1]);
+			   ty[0]=Rmath::inv_incpl_gamma(tx[0],tx[1]);
 			   ,
 			   // ATOMIC_REVERSE
 			   Type value = ty[0];
@@ -126,7 +126,7 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   1
 			   ,
 			   // ATOMIC_DOUBLE
-			   vy[0]=Rmath::D_lgamma(vx[0],vx[1]);
+			   ty[0]=Rmath::D_lgamma(tx[0],tx[1]);
 			   ,
 			   // ATOMIC_REVERSE
 			   CppAD::vector<Type> tx_(2);
@@ -141,15 +141,15 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   matmul
 			   ,
 			   // OUTPUT_DIM
-			   vx.size()/2
+			   tx.size()/2
 			   ,
 			   // ATOMIC_DOUBLE
-			   int n=sqrt(vx.size()/2);
+			   int n=sqrt(tx.size()/2);
 			   matrix<double> left(n,n);
 			   matrix<double> right(n,n);
-			   for(int i=0;i<n*n;i++){left(i)=vx[i];right(i)=vx[i+n*n];}
+			   for(int i=0;i<n*n;i++){left(i)=tx[i];right(i)=tx[i+n*n];}
 			   matrix<double> res=left*right; // Use Eigen matrix multiply
-			   for(int i=0;i<n*n;i++)vy[i]=res(i);
+			   for(int i=0;i<n*n;i++)ty[i]=res(i);
 			   ,
 			   // ATOMIC_REVERSE
 			   int n=sqrt(ty.size());
@@ -199,14 +199,14 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   matinv
 			   ,
 			   // OUTPUT_DIM
-			   vx.size()
+			   tx.size()
 			   ,
 			   // ATOMIC_DOUBLE
-			   int n=sqrt(vx.size());
+			   int n=sqrt(tx.size());
 			   matrix<double> X(n,n);
-			   for(int i=0;i<n*n;i++){X(i)=vx[i];}
+			   for(int i=0;i<n*n;i++){X(i)=tx[i];}
 			   matrix<double> res=X.inverse();   // Use Eigen matrix inverse (LU)
-			   for(int i=0;i<n*n;i++)vy[i]=res(i);
+			   for(int i=0;i<n*n;i++)ty[i]=res(i);
 			   ,
 			   // ATOMIC_REVERSE  (-f(X)^T*W*f(X)^T)
 			   int n=sqrt(ty.size());
@@ -226,11 +226,11 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   1
 			   ,
 			   // ATOMIC_DOUBLE
-			   matrix<double> X=vec2mat(vx);
+			   matrix<double> X=vec2mat(tx);
 			   matrix<double> LU=X.lu().matrixLU();    // Use Eigen LU decomposition
 			   vector<double> LUdiag = LU.diagonal();
 			   double res=LUdiag.abs().log().sum();    // TODO: currently PD only - take care of sign.
-			   vy[0] = res;
+			   ty[0] = res;
 			   ,
 			   // ATOMIC_REVERSE  (X^-1*W[0])
 			   CppAD::vector<Type> invX=matinv(tx);
