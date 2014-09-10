@@ -57,6 +57,21 @@ namespace Rmath {
 
 #include "ugly_macro.hpp"
 
+/* Utilities for conversion between CppAD::vector and Eigen::Matrix */
+template<class Type>
+matrix<Type> vec2mat(CppAD::vector<Type> x, int m, int n, int offset=0){
+  matrix<Type> res(m,n);
+  for(int i=0;i<m*n;i++)res(i)=x[i+offset];
+  return res;
+}
+template<class Type>
+CppAD::vector<Type> mat2vec(matrix<Type> x){
+  int n=x.size();
+  CppAD::vector<Type> res(n);
+  for(int i=0;i<n;i++)res[i]=x(i);
+  return res;
+}
+
 /* Derivative of pnorm1 (based on functions with known derivatives) */
 template<class Type>
 Type dnorm1(Type x){
@@ -148,62 +163,42 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   px[1] = Type(0);
 			   )
 
+
+template<class Type> /* Header of matmul interface */
+matrix<Type> matmul(matrix<Type> x, matrix<Type> y);
 TMB_ATOMIC_VECTOR_FUNCTION(
 			   // ATOMIC_NAME
 			   matmul
 			   ,
-			   // OUTPUT_DIM
+			   // OUTPUT_DIM (currently square matrix only)
 			   tx.size()/2
 			   ,
 			   // ATOMIC_DOUBLE
 			   int n=sqrt(tx.size()/2);
-			   matrix<double> left(n,n);
-			   matrix<double> right(n,n);
-			   for(int i=0;i<n*n;i++){left(i)=tx[i];right(i)=tx[i+n*n];}
-			   matrix<double> res=left*right; // Use Eigen matrix multiply
-			   for(int i=0;i<n*n;i++)ty[i]=res(i);
+			   matrix<double> X = vec2mat(tx, n, n, 0);
+			   matrix<double> Y = vec2mat(tx, n, n, n*n);
+			   matrix<double> res = X * Y;       // Use Eigen matrix multiply
+			   for(int i=0;i<n*n;i++)ty[i] = res(i);
 			   ,
-			   // ATOMIC_REVERSE
+			   // ATOMIC_REVERSE (W*Y^T, X^T*W)
 			   int n=sqrt(ty.size());
-			   CppAD::vector<Type> arg1(2*n*n);  // For mat-mult W*Y^T
-			   CppAD::vector<Type> arg2(2*n*n);  // For mat-mult X^T*W
-			   int k=0;
-			   for(int i=0;i<n;i++){
-			     for(int j=0;j<n;j++){
-			       arg1[k] = py[k];
-			       arg1[k+n*n] = tx[n*n + i + j*n];
-			       arg2[k] = tx[i + j*n];
-			       arg2[k+n*n] = py[k];
-			       k++;
-			     }
+			   matrix<Type> Xt = vec2mat(tx,n,n,0).transpose();
+			   matrix<Type> Yt = vec2mat(tx,n,n,n*n).transpose();
+			   matrix<Type> W = vec2mat(py,n,n);
+			   matrix<Type> res1 = matmul(W, Yt); // W*Y^T
+			   matrix<Type> res2 = matmul(Xt, W); // X^T*W
+			   for(int i=0;i<n*n;i++){
+			     px[i]     = res1(i);
+			     px[i+n*n] = res2(i);
 			   }
-			   CppAD::vector<Type> res1=matmul(arg1);
-			   CppAD::vector<Type> res2=matmul(arg2);
-			   for(int i=0;i<n*n;i++){px[i]=res1[i];px[i+n*n]=res2[i];}
 			   )
-
-
-/* Utilities for easier use of matmul symbol */
-template<class Type>
-matrix<Type> vec2mat(CppAD::vector<Type> x){
-  int n=sqrt(x.size());
-  matrix<Type> res(n,n);
-  for(int i=0;i<n*n;i++)res(i)=x[i];
-  return res;
-}
-template<class Type>
-CppAD::vector<Type> mat2vec(matrix<Type> x){
-  int n=x.size();
-  CppAD::vector<Type> res(n);
-  for(int i=0;i<n;i++)res[i]=x(i);
-  return res;
-}
+/* matmul interface */
 template<class Type>
 matrix<Type> matmul(matrix<Type> x, matrix<Type> y){
   CppAD::vector<Type> arg(x.size()+y.size());
   for(int i=0;i<x.size();i++){arg[i]=x(i);}
   for(int i=0;i<y.size();i++){arg[i+x.size()]=y(i);}
-  return vec2mat(matmul(arg));
+  return vec2mat(matmul(arg),x.rows(),y.cols());
 }
 
 TMB_ATOMIC_VECTOR_FUNCTION(
@@ -222,8 +217,8 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   ,
 			   // ATOMIC_REVERSE  (-f(X)^T*W*f(X)^T)
 			   int n=sqrt(ty.size());
-			   matrix<Type> W=vec2mat(py);       // Range direction
-			   matrix<Type> Y=vec2mat(ty);       // f(X)
+			   matrix<Type> W=vec2mat(py,n,n);   // Range direction
+			   matrix<Type> Y=vec2mat(ty,n,n);   // f(X)
 			   matrix<Type> Yt=Y.transpose();    // f(X)^T
 			   matrix<Type> tmp=matmul(W,Yt);    // W*f(X)^T
 			   matrix<Type> res=-matmul(Yt,tmp); // -f(X)^T*W*f(X)^T
@@ -238,7 +233,8 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 			   1
 			   ,
 			   // ATOMIC_DOUBLE
-			   matrix<double> X=vec2mat(tx);
+			   int n=sqrt(tx.size());
+			   matrix<double> X=vec2mat(tx,n,n);
 			   matrix<double> LU=X.lu().matrixLU();    // Use Eigen LU decomposition
 			   vector<double> LUdiag = LU.diagonal();
 			   double res=LUdiag.abs().log().sum();    // TODO: currently PD only - take care of sign.
