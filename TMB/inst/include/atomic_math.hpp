@@ -250,17 +250,19 @@ TMB_ATOMIC_VECTOR_FUNCTION(
 */
 
 template<class Type>
-Type pnorm(Type q, Type mean = 0, Type sd = 1){
+Type pnorm(Type q, Type mean = 0, Type sd = 1, int give_log=0){
   CppAD::vector<Type> tx(1);
   tx[0] = (q - mean) / sd;
-  return pnorm1(tx)[0];
+  if(!give_log) return pnorm1(tx)[0];
+  else return log(pnorm1(tx)[0]);
 }
 
 template<class Type>
-Type qnorm(Type p, Type mean = 0, Type sd = 1){
+Type qnorm(Type p, Type mean = 0, Type sd = 1, int give_log=0){
   CppAD::vector<Type> tx(1);
   tx[0] = p;
-  return sd*qnorm1(tx)[0] + mean;
+  if(!give_log) return sd*qnorm1(tx)[0] + mean;
+  else return log(sd*qnorm1(tx)[0] + mean);
 }
 
 template<class Type>
@@ -272,20 +274,22 @@ Type lgamma(Type x){
 }
 
 template<class Type>
-Type pgamma(Type q, Type shape, Type scale = 1){
+Type pgamma(Type q, Type shape, Type scale = 1, int give_log=0){
   CppAD::vector<Type> tx(3);
   tx[0] = q/scale;
   tx[1] = shape;
   tx[2] = Type(0); // 0'order deriv
-  return D_incpl_gamma_shape(tx)[0] / exp(lgamma(shape));
+  if(!give_log) return D_incpl_gamma_shape(tx)[0] / exp(lgamma(shape));
+  else return log( D_incpl_gamma_shape(tx)[0] ) - lgamma(shape);
 }
 
 template<class Type>
-Type qgamma(Type q, Type shape, Type scale = 1){
+Type qgamma(Type q, Type shape, Type scale = 1, int give_log=0){
   CppAD::vector<Type> tx(2);
   tx[0] = q * exp(lgamma(shape));
   tx[1] = shape;
-  return inv_incpl_gamma(tx)[0] * scale;
+  if(!give_log) return inv_incpl_gamma(tx)[0] * scale;
+  else return log( inv_incpl_gamma(tx)[0] ) + log(scale);
 }
 
 /* Temporary test of dmvnorm implementation based on atomic symbols.

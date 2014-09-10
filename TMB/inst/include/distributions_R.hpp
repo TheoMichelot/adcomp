@@ -239,3 +239,15 @@ Type dmultinom(vector<Type> x, vector<Type> p, int give_log=0)
 	if(give_log) return logres;
 	else return exp(logres);
 }
+
+using atomic::pnorm;
+VECTORIZE4_ttti(pnorm);
+
+using atomic::qnorm;
+VECTORIZE4_ttti(qnorm);
+
+using atomic::pgamma;
+VECTORIZE4_ttti(pgamma);
+
+using atomic::qgamma;
+VECTORIZE4_ttti(qgamma);
