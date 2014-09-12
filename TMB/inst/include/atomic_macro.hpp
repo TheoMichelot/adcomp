@@ -19,6 +19,7 @@ private:								\
 		       CppAD::vector<Type>& ty				\
 		       )						\
   {									\
+    if(q>0)error("Atomic '" #ATOMIC_NAME "' order not implemented.\n");	\
     if( vx.size() > 0 ){						\
       bool anyvx = false;						\
       for(int i=0;i<vx.size();i++)anyvx |= vx[i];			\
@@ -34,6 +35,7 @@ private:								\
 		       const CppAD::vector<Type>& py			\
 		       )						\
   {									\
+    if(q>0)error("Atomic '" #ATOMIC_NAME "' order not implemented.\n");	\
     ATOMIC_REVERSE;							\
     return true;							\
   }									\
