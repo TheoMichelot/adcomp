@@ -226,13 +226,13 @@ Type dmultinom(vector<Type> x, vector<Type> p, int give_log=0)
 }
 
 using atomic::pnorm;
-VECTORIZE4_ttti(pnorm);
+VECTORIZE3_ttt(pnorm);
 
 using atomic::qnorm;
-VECTORIZE4_ttti(qnorm);
+VECTORIZE3_ttt(qnorm);
 
 using atomic::pgamma;
-VECTORIZE4_ttti(pgamma);
+VECTORIZE3_ttt(pgamma);
 
 using atomic::qgamma;
-VECTORIZE4_ttti(qgamma);
+VECTORIZE3_ttt(qgamma);
