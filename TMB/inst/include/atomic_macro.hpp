@@ -1,8 +1,11 @@
 #define TMB_ATOMIC_VECTOR_FUNCTION(ATOMIC_NAME,OUTPUT_DIM,ATOMIC_DOUBLE,ATOMIC_REVERSE) \
-CppAD::vector<double> ATOMIC_NAME(CppAD::vector<double> x);		\
-CppAD::vector<AD<double > > ATOMIC_NAME(CppAD::vector<AD<double> > x);	\
-CppAD::vector<AD<AD<double> > > ATOMIC_NAME(CppAD::vector<AD<AD<double> > > x);	\
-CppAD::vector<AD<AD<AD<double> > > > ATOMIC_NAME(CppAD::vector<AD<AD<AD<double> > > > x); \
+CppAD::vector<double> ATOMIC_NAME(CppAD::vector<double> tx){		\
+  CppAD::vector<double> ty(OUTPUT_DIM);					\
+  ATOMIC_DOUBLE;							\
+  return ty;								\
+}									\
+template <class Type>							\
+CppAD::vector<AD<Type > > ATOMIC_NAME(CppAD::vector<AD<Type> > x);	\
 template <class Type>							\
 class atomic##ATOMIC_NAME : public CppAD::atomic_base<Type> {		\
 public:									\
@@ -55,27 +58,11 @@ private:								\
     error("Should not be called");					\
   }									\
 };									\
-CppAD::vector<double> ATOMIC_NAME(CppAD::vector<double> tx){		\
-  CppAD::vector<double> ty(OUTPUT_DIM);					\
-  ATOMIC_DOUBLE;							\
-  return ty;								\
-}									\
-atomic##ATOMIC_NAME<double> afun1##ATOMIC_NAME("atomic_" #ATOMIC_NAME); \
-CppAD::vector<AD<double > > ATOMIC_NAME(CppAD::vector<AD<double> > tx){	\
-  CppAD::vector<AD<double> > ty(OUTPUT_DIM);				\
-  afun1##ATOMIC_NAME(tx,ty);						\
-  return ty;								\
-}									\
-atomic##ATOMIC_NAME<AD<double> > afun2##ATOMIC_NAME("atomic_" #ATOMIC_NAME); \
-CppAD::vector<AD<AD<double> > > ATOMIC_NAME(CppAD::vector<AD<AD<double> > > tx){ \
-  CppAD::vector<AD<AD<double> > > ty(OUTPUT_DIM);			\
-  afun2##ATOMIC_NAME(tx,ty);						\
-  return ty;								\
-}									\
-atomic##ATOMIC_NAME<AD<AD<double> > > afun3##ATOMIC_NAME("atomic_" #ATOMIC_NAME); \
-CppAD::vector<AD<AD<AD<double> > > > ATOMIC_NAME(CppAD::vector<AD<AD<AD<double> > > > tx){ \
-  CppAD::vector<AD<AD<AD<double> > > > ty(OUTPUT_DIM);			\
-  afun3##ATOMIC_NAME(tx,ty);						\
+template<class Type> 							\
+CppAD::vector<AD<Type > > ATOMIC_NAME(CppAD::vector<AD<Type > > tx){	\
+  static atomic##ATOMIC_NAME<Type > afun##ATOMIC_NAME("atomic_" #ATOMIC_NAME); \
+  CppAD::vector<AD<Type > > ty(OUTPUT_DIM);				\
+  afun##ATOMIC_NAME(tx,ty);						\
   return ty;								\
 }
 
