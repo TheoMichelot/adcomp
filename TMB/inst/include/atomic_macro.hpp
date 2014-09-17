@@ -1,9 +1,17 @@
+/* Conditionally skip compilation */
+#ifdef WITH_LIBTMB
+#define CSKIP(x) ;
+#endif
+#ifndef WITH_LIBTMB
+#define CSKIP(x) x
+#endif
+
 #define TMB_ATOMIC_VECTOR_FUNCTION(ATOMIC_NAME,OUTPUT_DIM,ATOMIC_DOUBLE,ATOMIC_REVERSE) \
-CppAD::vector<double> ATOMIC_NAME(CppAD::vector<double> tx){		\
+CppAD::vector<double> ATOMIC_NAME(CppAD::vector<double> tx)CSKIP({	\
   CppAD::vector<double> ty(OUTPUT_DIM);					\
   ATOMIC_DOUBLE;							\
   return ty;								\
-}									\
+})									\
 template <class Type>							\
 CppAD::vector<AD<Type > > ATOMIC_NAME(CppAD::vector<AD<Type> > x);	\
 template <class Type>							\
