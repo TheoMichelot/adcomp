@@ -737,7 +737,11 @@ extern "C"
     /* Get the default parameter vector (tiny overhead) */
     SEXP par,res=NULL,info;
     objective_function< double > F(data,parameters,report);
+#ifdef _OPENMP
+    int n=F.count_parallel_regions(); // Evaluates user template
+#else
     F.count_parallel_regions(); // Evaluates user template
+#endif
     if(returnReport && F.reportvector.size()==0){
       /* Told to report, but no ADREPORT in template: Get out quickly */
       return R_NilValue;
@@ -942,7 +946,11 @@ extern "C"
     /* Get the default parameter vector (tiny overhead) */
     SEXP par,res=NULL;
     objective_function< double > F(data,parameters,report);
+#ifdef _OPENMP
+    int n=F.count_parallel_regions(); // Evaluates user template
+#else
     F.count_parallel_regions(); // Evaluates user template
+#endif
     PROTECT(par=F.defaultpar());
 
     if(_openmp){ // Parallel mode
