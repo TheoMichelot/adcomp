@@ -735,9 +735,9 @@ extern "C"
     int returnReport = INTEGER(getListElement(control,"report"))[0];
 
     /* Get the default parameter vector (tiny overhead) */
-    SEXP par,res,info;
+    SEXP par,res=NULL,info;
     objective_function< double > F(data,parameters,report);
-    int n=F.count_parallel_regions(); // Evaluates user template
+    F.count_parallel_regions(); // Evaluates user template
     if(returnReport && F.reportvector.size()==0){
       /* Told to report, but no ADREPORT in template: Get out quickly */
       return R_NilValue;
@@ -940,9 +940,9 @@ extern "C"
     if(!isEnvironment(report))error("'report' must be an environment");
 
     /* Get the default parameter vector (tiny overhead) */
-    SEXP par,res;
+    SEXP par,res=NULL;
     objective_function< double > F(data,parameters,report);
-    int n=F.count_parallel_regions(); // Evaluates user template
+    F.count_parallel_regions(); // Evaluates user template
     PROTECT(par=F.defaultpar());
 
     if(_openmp){ // Parallel mode
