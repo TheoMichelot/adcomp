@@ -56,6 +56,7 @@ namespace Rmath {
 }
 
 #include "atomic_macro.hpp"
+#include "checkpoint_macro.hpp"
 
 /* Utilities for conversion between CppAD::vector and Eigen::Matrix */
 template<class Type>
