@@ -88,6 +88,16 @@ updateCholesky <- function(L,H,t=0){
 ##'   \item \code{last.par.best} Full parameter of the best likelihood evaluation.
 ##'   \item \code{tracepar} Trace every likelihood evaluation ?
 ##'   \item \code{tracemgc} Trace mgc of every gradient evaluation ?
+##'   \item \code{silent} Pass 'silent=TRUE' to all try-calls ?
+##' }
+##'
+##' A high level of tracing information will be output by default when evaluating the objective function and gradient.
+##' This is useful while developing a model, but may eventually become annoying.
+##' The following will disable all tracing from an object 'obj' returned by 'MakeADFun':
+##' \itemize{
+##' \item \code{obj$env$tracemgc <- FALSE}
+##' \item \code{obj$env$inner.control$trace <- FALSE}
+##' \item \code{obj$env$silent <- TRUE}
 ##' }
 ##' 
 ##' @title Construct objective functions with derivatives based on a compiled c++ template.
@@ -458,7 +468,7 @@ MakeADFun <- function(data,parameters,map=list(),
                                       ##he=function(x)f0(x,order=2)),
                                       he=H0,env=env),
                                  inner.control)
-                          )
+                          ), silent=silent
                  )
       if(is.character(opt))return(NaN)
     } else{  
@@ -635,7 +645,7 @@ MakeADFun <- function(data,parameters,map=list(),
     as.list(reportenv)
   }
 
-  silent <- TRUE
+  silent <- FALSE
   tracepar <- FALSE
   validpar <- function(x)TRUE
   tracemgc <- TRUE
@@ -865,6 +875,7 @@ dynlib <- function(x)paste0(x,.Platform$dynlib.ext)
 ##'     DATA_SCALAR(name)         \tab     Type                       \tab    numeric(1)    \cr
 ##'     DATA_INTEGER(name)        \tab     int                        \tab    integer(1)    \cr
 ##'     DATA_FACTOR(name)         \tab     vector<int>                \tab    factor        \cr
+##'     DATA_IVECTOR(name)        \tab     vector<int>                \tab    integer       \cr
 ##'     DATA_SPARSE_MATRIX(name)  \tab     Eigen::SparseMatrix<Type>  \tab    dgTMatrix     \cr
 ##'     DATA_ARRAY(name)          \tab     array<Type>                \tab    array         \cr
 ##'     PARAMETER_MATRIX(name)    \tab     matrix<Type>               \tab    matrix        \cr
